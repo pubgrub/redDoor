@@ -4,7 +4,8 @@ import os
 
 # mode: 1 = Lösungen suchen, in results.txt schreiben
 #       2 = results.txt lesen, versuchen auszudünnen
-mode = 2
+doSolve = 0
+doAnalyze = 1
 
 
 dotsX = [ 1, 1, 0, 3, 2, 2, 6, 1]
@@ -115,12 +116,12 @@ def solve( x, y, used, pathX, pathY):
         newX = x + moveX[ i]
         newY = y + moveY[ i]
         if( newX > 6 or newX < 0 or newY > 6 or newY < 0):
-#            print( "Out of bounds: ", newX, newY)
+            # print( "Out of bounds: ", newX, newY)
             continue
         if( used[newX][newY] == 1):
-#            print("used: ", newX, newY)
-#            for i in range( 7):
-#                print( used[i])
+            #  print("used: ", newX, newY)
+            #  for i in range( 7):
+            #  print( used[i])
             continue
         n = n + 1
         if( n % 1000 == 0):
@@ -154,6 +155,9 @@ def analyze():
 
     dOrders1 = {}
     dOrders2 = {}
+
+    nTurns = 0
+    lenPath = 0
 
     file = open( "results.txt", "r")
 
@@ -204,6 +208,8 @@ def analyze():
             dOrder = []
             dOrder1 = []
             dOrder2 = []
+            nTurns = 0
+            lenPath = 0
 
         pathX.append( x)
         pathY.append( y)
@@ -235,12 +241,13 @@ def analyze():
         print( k, dOrders2[k])
     return 0
 
-if mode == 1:
+if doSolve:
     file = open( "results.txt", "w")
     pathX = []
     pathY = []
     solve( startx, starty, used, pathX, pathY)
+    file.close()
 
-if mode == 2:
+if doAnalyze:
     analyze()
     quit()
