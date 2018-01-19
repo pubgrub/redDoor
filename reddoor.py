@@ -10,8 +10,8 @@ doAnalyze = 1
 
 dotsX = [ 1, 1, 0, 3, 2, 2, 6, 1]
 dotsY = [ 1 ,5, 2, 2, 3, 4, 5, 6]
-dotsS = [ 2, 2, 2, 3, 1, 0, 1, 3]
-#dotsS = [ 1, 1, 2, 1, 3, 0, 2, 3]
+dotsSize = [ "2", "2", "2", "3", "1", "0", "1", "3"]
+dotsColor = [ "1", "1", "2", "1", "3", "0", "2", "3"]
 
 
 moveX = [ 1, 0, -1, 0]
@@ -144,20 +144,51 @@ def getNumber( o):
 def analyze():
     global dotsX
     global dotsY
+
+    solution = 0
+
+
     wfile = open("analyzed.txt", "w")
     pathX = []
     pathY = []
-    dOrder = []
-    dOrder1 = []
-    dOrder2 = []
-    dOrders = {}
-    dotsSs = {}
 
-    dOrders1 = {}
-    dOrders2 = {}
+    dots_OrderString = ""
+    dots1_OrderString = ""
+    dots2_OrderString = ""
 
-    nTurns = 0
+    dots_SizeString = ""
+    dots1_SizeString = ""
+    dots2_SizeString = ""
+
+    dots_ColorString = ""
+    dots1_ColorString = ""
+    dots2_ColorString = ""
+
+
+    pathXList = []
+    pathYList = []
+
+    dots_OrderStringList = []
+    dots_OrderStringList = []
+    dots_OrderStringList = []
+
+    dots_SizeStringList = []
+    dots1_SizeStringList = []
+    dots2_SizeStringList = []
+
+    dots_ColorStringList = []
+    dots1_ColorStringList = []
+    dots2_ColorStringList = []
+
+
+
+    nTurn = 0
+    dir = 0
     lenPath = 0
+
+    nTurnList = []
+    lenPathList = []
+
 
     file = open( "results.txt", "r")
 
@@ -168,77 +199,110 @@ def analyze():
 
     for line in file:
         x, y = [int(i) for i in line.split()]
-        if( x == 0 and y == 6):
+
+        if( not ( x == 0 and y == 6)):
+            # neuen Punkt merken
+            pathX.append( x)
+            pathY.append( y)
+
+            # Länge des Pfades erhöhen
+            lenPath += 1
+
+            # auf Richtungsänderung überprüfen
+            akt_dir = x - pathX[ -2] + ( y - pathY[ -2]) * 2
+            if( dir != akt_dir):
+                nTurn += 1
+                dir = akt_dir
+
+            # Aktuellen Punkt auf Dot überprüfen und wenn ja in Listen schreiben
+            for d in range( len(dotsX)):
+                dotsSizeID = dotsSize[ d]
+                dotsColorID = dotsColor[ d]
+                if( dotsSizeID != "0"):
+                    if ( dotsX[d] == x and dotsY[d] == y) :
+                        dots_OrderString += str( d).strip()
+                        dots_SizeString += dotsSizeID
+                        dots_ColorString += dotsColorID
+
+                        dots1_OrderString += str( d).strip()
+                        dots1_SizeString += dotsSizeID
+                        dots1_ColorString += dotsColorID
+                        break
+                    if( dotsX[d] == 6 - x and dotsY[d] == 6 - y):
+                        dots_OrderString += str( d).strip()
+                        dots_SizeString += dotsSizeID
+                        dots_ColorString += dotsColorID
+
+                        dots2_OrderString += str( d).strip()
+                        dots2_SizeString += dotsSizeID
+                        dots2_ColorString += dotsColorID
+                        break
+
+        else:
             # neue Lösung
-            for n in range(len( pathX)):
-                print( pathX[n], pathY[n], file = wfile)
-            print( dOrder, file = wfile)
-            dotsSStr = ""
-            dots1 = ""
-            dots2 = ""
-            for i in dOrder:
-                if( dotsS[i]) != 0:
-                    dotsSStr = dotsSStr + str(dotsS[ i]).strip()
-            for i in dOrder1:
-                if( dotsS[i]) != 0:
-                    dots1 = dots1 + str(dotsS[ i]).strip()
-            for i in dOrder2:
-                if( dotsS[i]) != 0:
-                    dots2 = dots2 + str(dotsS[ i]).strip()
-            r = getNumber( dOrder)
+
+
+            # Pfad in Array schreiben
+            pathXList.append( pathX)
+            pathYList.append( pathY)
+
+
+
+
+            r = getNumber( dots_SizeOrder)
             print( r, file = wfile)
-            print( dotsSStr, file = wfile)
-            if r in dOrders:
-                dOrders[ r] = dOrders[ r] + 1
-            else:
-                dOrders[ r] = 1
-            if( dots1 in dOrders1):
-                dOrders1[dots1] = dOrders1[dots1] + 1
-            else:
-                dOrders1[dots1] = 1
-            if( dots2 in dOrders2):
-                dOrders2[dots2] = dOrders2[dots2] + 1
-            else:
-                dOrders2[dots2] = 1
+            print( dotsSizeString, file = wfile)
+
+            #  increment Dictionary entry, or create entry
+            dots_SizeOrders[ r] = dots_SizeOrders.get( r, 0) + 1
+            dots_SizeOrders1[dots_1_SizeString] = dots_SizeOrders1.get(dots_1_SizeString, 0) + 1
+            dots_SizeOrders2[dots_2_SizeString] = dots_SizeOrders2.get(dots_2_SizeString, 0) + 1
 
 
-            dotsSs[ r] = dotsSStr
+            dotsSs[ r] = dotsSizeString
+
+            # Variablen resetten
+
             pathX = []
             pathY = []
-            dOrder = []
-            dOrder1 = []
-            dOrder2 = []
-            nTurns = 0
+            dots_SizeOrder = []
+            dots_1_SizeOrder = []
+            dots_2_SizeOrder = []
+            nTurn = 0
+            dir = 0
             lenPath = 0
 
-        pathX.append( x)
-        pathY.append( y)
-        for d in range( len(dotsX)):
-            if ( dotsX[d] == x and dotsY[d] == y) :
-                dOrder1.append( d)
-                dOrder.append( d)
-                break
-            if( dotsX[d] == 6 - x and dotsY[d] == 6 - y):
-                dOrder2.append( d)
-                dOrder.append( d)
-                break
-        # if( ( x == 2 and ( y == 4 or y == 3) ) or ( x == 4 and ( y == 2 or y == 3))):
-        #     dOrder.append( )
+            dotsSizeString = ""
+            dots_1_SizeString = ""
+            dots_2_SizeString = ""
+
+
+                # if( ( x == 2 and ( y == 4 or y == 3) ) or ( x == 4 and ( y == 2 or y == 3))):
+        #     dots_SizeOrder.append( )
+
+    file.close()
+
     print( pathX, pathY, file = wfile)
-    print( dOrder, file = wfile)
+    print( dots_SizeOrder, file = wfile)
 
     for k in sorted(dotsSs, key=dotsSs.__getitem__):
-        print(k, dOrders[k], dotsSs[ k])
+        print(k, dots_SizeOrders[k], dotsSs[ k])
     print()
     print("Schlange 1: ")
     print()
-    for k in dOrders1:
-        print( k, dOrders1[k])
+    for k in dots_SizeOrders1:
+        print( k, dots_SizeOrders1[k])
     print()
     print("Schlange 2: ")
     print()
-    for k in dOrders2:
-        print( k, dOrders2[k])
+    for k in dots_SizeOrders2:
+        print( k, dots_SizeOrders2[k])
+
+    # Ergebnisse in Datei schreiben
+    for n in range(len( pathX)):
+        print( pathX[n], pathY[n], file = wfile)
+    print( dots_SizeOrder, file = wfile)
+
     return 0
 
 if doSolve:
