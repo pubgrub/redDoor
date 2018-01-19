@@ -52,7 +52,7 @@ def testSolution( u, px, py):
                 return 1;
     return 0
 
-def printSolution( px, py):
+def printSolution( px, py, f):
     global solutions
     global file
 
@@ -72,7 +72,7 @@ def printSolution( px, py):
         s = ""
         for x in range(7 * 2):
             s = s + grid[x][y]
-        print( s)
+        print( s, file = f)
 
     for i in range( len(px)):
         print( px[i], py[i])
@@ -90,11 +90,11 @@ def printSolution( px, py):
         s = ""
         for x in range(7 * 2):
             s = s + grid[x][y]
-        print( s)
-#    input("next...1111111")
+        print( s, file = f)
+    #   input("next...1111111")
     solutions = solutions + 1
     for i in range( len(px)):
-        print( px[i], py[i], file = file)
+        print( px[i], py[i], file = f)
 
 
 def solve( x, y, used, pathX, pathY):
@@ -148,7 +148,6 @@ def analyze():
     solution = 0
 
 
-    wfile = open("analyzed.txt", "w")
     pathX = []
     pathY = []
 
@@ -169,8 +168,8 @@ def analyze():
     pathYList = []
 
     dots_OrderStringList = []
-    dots_OrderStringList = []
-    dots_OrderStringList = []
+    dots1_OrderStringList = []
+    dots2_OrderStringList = []
 
     dots_SizeStringList = []
     dots1_SizeStringList = []
@@ -180,6 +179,9 @@ def analyze():
     dots1_ColorStringList = []
     dots2_ColorStringList = []
 
+    dots_OrderDict = {}
+    dots_SizeDict = {}
+    dots_ColorDict = {}
 
 
     nTurn = 0
@@ -189,13 +191,12 @@ def analyze():
     nTurnList = []
     lenPathList = []
 
-
     file = open( "results.txt", "r")
 
+    # Erste Zeile manuell holen, löst keine Analyse aus
     x, y = [int(i) for i in next(file).split()] # erste Zeile
     pathX.append( x)
     pathY.append( y)
-
 
     for line in file:
         x, y = [int(i) for i in line.split()]
@@ -242,68 +243,95 @@ def analyze():
             # neue Lösung
 
 
-            # Pfad in Array schreiben
+            # Pfad und Strings in Arrays schreiben
             pathXList.append( pathX)
             pathYList.append( pathY)
 
+            dots_OrderStringList.append( dots_OrderString)
+            dots1_OrderStringList.append( dots1_OrderString)
+            dots2_OrderStringList.append( dots2_OrderString)
 
+            dots_SizeStringList.append( dots_SizeString)
+            dots1_SizeStringList.append( dots1_SizeString)
+            dots2_SizeStringList.append( dots2_SizeString)
 
+            dots_ColorStringList.append( dots_ColorString)
+            dots1_ColorStringList.append( dots1_ColorString)
+            dots2_ColorStringList.append( dots2_ColorString)
 
-            r = getNumber( dots_SizeOrder)
-            print( r, file = wfile)
-            print( dotsSizeString, file = wfile)
+            nTurnList.append( nTurn)
+            lenPathList.append( lenPath)
 
-            #  increment Dictionary entry, or create entry
-            dots_SizeOrders[ r] = dots_SizeOrders.get( r, 0) + 1
-            dots_SizeOrders1[dots_1_SizeString] = dots_SizeOrders1.get(dots_1_SizeString, 0) + 1
-            dots_SizeOrders2[dots_2_SizeString] = dots_SizeOrders2.get(dots_2_SizeString, 0) + 1
+            dots_OrderDict[ dots_OrderString] = dots_OrderDict.get( dots_OrderString, 0) + 1
+            dots_SizeDict[ dots_SizeString] = dots_SizeDict.get( dots_SizeString, 0) + 1
+            dots_ColorDict[ dots_ColorString] = dots_ColorDict.get( dots_ColorString, 0) + 1
 
-
-            dotsSs[ r] = dotsSizeString
 
             # Variablen resetten
-
-            pathX = []
-            pathY = []
-            dots_SizeOrder = []
-            dots_1_SizeOrder = []
-            dots_2_SizeOrder = []
+            pathX = [ x]
+            pathY = [ y]
             nTurn = 0
             dir = 0
             lenPath = 0
 
-            dotsSizeString = ""
-            dots_1_SizeString = ""
-            dots_2_SizeString = ""
+            dots_OrderString = ""
+            dots1_OrderString = ""
+            dots2_OrderString = ""
 
 
-                # if( ( x == 2 and ( y == 4 or y == 3) ) or ( x == 4 and ( y == 2 or y == 3))):
-        #     dots_SizeOrder.append( )
+            dots_SizeString = ""
+            dots1_SizeString = ""
+            dots2_SizeString = ""
+
+            dots_ColorString = ""
+            dots1_ColorString = ""
+            dots2_ColorString = ""
+
+            solution += 1
 
     file.close()
 
-    print( pathX, pathY, file = wfile)
-    print( dots_SizeOrder, file = wfile)
+    wfile = open("analyzed.txt", "w")
+    for i in range( len( pathXList)):
+        print( "Solution: " + str( i), file = wfile)
+        print( pathXList[ i], pathYList[ i], file = wfile)
+        print( "Pathlength: ", lenPathList[ i], file = wfile)
+        print( "Dots Order: ", dots_OrderStringList[ i], file=wfile)
+        print( "Size Order: ", dots_SizeStringList[ i], file = wfile)
+        print( "Color Order: ", dots_ColorStringList[ i], file = wfile)
+        print( "Turns: ", nTurnList[ i], file = wfile)
+        printSolution( pathXList[ i], pathYList[ i], wfile)
+    wfile.close()
 
-    for k in sorted(dotsSs, key=dotsSs.__getitem__):
-        print(k, dots_SizeOrders[k], dotsSs[ k])
-    print()
-    print("Schlange 1: ")
-    print()
-    for k in dots_SizeOrders1:
-        print( k, dots_SizeOrders1[k])
-    print()
-    print("Schlange 2: ")
-    print()
-    for k in dots_SizeOrders2:
-        print( k, dots_SizeOrders2[k])
+#    for k in sorted(nTurnList, key=dotsSs.__getitem__):
+#        print(k, dots_SizeOrders[k], dotsSs[ k])
 
-    # Ergebnisse in Datei schreiben
-    for n in range(len( pathX)):
-        print( pathX[n], pathY[n], file = wfile)
-    print( dots_SizeOrder, file = wfile)
+    max_turns = 0
+    max_len = 0
+    max_turnLen = 0
 
-    return 0
+    for i in range( len(pathXList)):
+        max_turns = max( max_turns, nTurnList[ i])
+        max_len = max( max_len, lenPathList[ i])
+        max_turnLen = (max( max_turnLen, nTurnList[ i] + lenPathList[ i]))
+    print( "Anzahl Schritte:")
+    for i in range( len(pathXList)):
+        if lenPathList[ i] == max_len:
+            print( i, dots_SizeDict[ dots_SizeStringList[ i]])
+    print( "Anzahl Turns:")
+    for i in range( len(pathXList)):
+        if nTurnList[ i] == max_turns:
+            print( i, dots_SizeDict[ dots_SizeStringList[ i]])
+    print( "Kombiniert:")
+    for i in range( len(pathXList)):
+        if nTurnList[ i] + lenPathList[ i] == max_turnLen - 2:
+            print( i, dots_SizeDict[ dots_SizeStringList[ i]])
+
+
+
+    print( max_turns)
+    print( max_len)
+    return
 
 if doSolve:
     file = open( "results.txt", "w")
