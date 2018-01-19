@@ -6,7 +6,7 @@ import os
 #       2 = results.txt lesen, versuchen auszudünnen
 doSolve = 0
 doAnalyze = 1
-
+doFileOutput = 0
 
 dotsX = [ 1, 1, 0, 3, 2, 2, 6, 1]
 dotsY = [ 1 ,5, 2, 2, 3, 4, 5, 6]
@@ -56,45 +56,57 @@ def printSolution( px, py, f):
     global solutions
     global file
 
+    size = 7
+
     lastX = px[0]
     lastY = py[0]
+    lastRevX = 6 - px[0]
+    lastRevY = 6 - py[0]
 
-    # print( lastX)
-    # print( lastY)
-    # quit()
+    grid  = [[" " for i in range(size * 2 + 1)] for j in range(size * 4 + 2) ]
 
-    grid  = [[" " for i in range(7 * 2)] for j in range(7 * 2)]
-    for x in range(7):
-        for y in range(7):
-            grid[x * 2][y * 2] = "-"
+    #Innenkästen Zeichnen
+    for y in range( size * 2 - 1):
+        for x in range( size * 4 - 2):
+            if( y % 2 == 1):
+                if( x % 4 == 2):
+                    grid[ x][ y] = "["
+                if( x % 4 == 3):
+                    grid[ x][ y] = "]"
 
-    for y in  range(7 * 2):
-        s = ""
-        for x in range(7 * 2):
-            s = s + grid[x][y]
-        print( s, file = f)
+    #Beide Paths zeichnen
+    for p in range( len( px)):
+        x = px[ p]
+        y = py[ p]
+        revX = 6 - x
+        revY = 6 - y
 
-    for i in range( len(px)):
-        print( px[i], py[i])
-
-    for p in range( 1, len( px)):
-        if( lastX != px[p]):
-            grid [lastX + px[p]] [py[p] * 2] = "O"
+        if( lastX != x):
+            grid [ (lastX + x) * 2 ] [ y * 2] = "O"
+            grid [ (lastX + x) * 2  + 1] [ y * 2] = "O"
+            grid [ (lastRevX + revX) * 2 ] [ revY * 2] = "0"
+            grid [ (lastRevX + revX) * 2  + 1] [ revY * 2] = "0"
         else:
-            grid[px[p] * 2][lastY + py[p]] = "O"
-        grid[ px[p] * 2][py[p] * 2] = "O"
-        lastX = px[p]
-        lastY = py[p]
+            grid[ x * 4] [ lastY + y] = "O"
+            grid[ x * 4 + 1] [ lastY + y] = "O"
+            grid[ revX * 4] [ lastRevY + revY] = "0"
+            grid[ revX * 4 + 1] [ lastRevY + revY] = "0"
 
-    for y in  range(7 * 2):
+        grid[ x * 4] [ y * 2] = "O"
+        grid[ x * 4 + 1] [y * 2] = "O"
+        grid[ revX * 4] [ revY * 2] = "0"
+        grid[ revX * 4 + 1] [ revY * 2] = "0"
+
+        lastX = x
+        lastY = y
+        lastRevX = revX
+        lastRevY = revY
+
+    for y in  range(size * 2 + 1):
         s = ""
-        for x in range(7 * 2):
+        for x in range(size * 4 + 2):
             s = s + grid[x][y]
         print( s, file = f)
-    #   input("next...1111111")
-    solutions = solutions + 1
-    for i in range( len(px)):
-        print( px[i], py[i], file = f)
 
 
 def solve( x, y, used, pathX, pathY):
@@ -291,20 +303,19 @@ def analyze():
 
     file.close()
 
-    wfile = open("analyzed.txt", "w")
-    for i in range( len( pathXList)):
-        print( "Solution: " + str( i), file = wfile)
-        print( pathXList[ i], pathYList[ i], file = wfile)
-        print( "Pathlength: ", lenPathList[ i], file = wfile)
-        print( "Dots Order: ", dots_OrderStringList[ i], file=wfile)
-        print( "Size Order: ", dots_SizeStringList[ i], file = wfile)
-        print( "Color Order: ", dots_ColorStringList[ i], file = wfile)
-        print( "Turns: ", nTurnList[ i], file = wfile)
-        printSolution( pathXList[ i], pathYList[ i], wfile)
-    wfile.close()
+    if( doFileOutput):
+        wfile = open("analyzed.txt", "w")
+        for i in range( len( pathXList)):
+            print( "Solution: " + str( i), file = wfile)
+            print( pathXList[ i], pathYList[ i], file = wfile)
+            print( "Pathlength: ", lenPathList[ i], file = wfile)
+            print( "Dots Order: ", dots_OrderStringList[ i], file=wfile)
+            print( "Size Order: ", dots_SizeStringList[ i], file = wfile)
+            print( "Color Order: ", dots_ColorStringList[ i], file = wfile)
+            print( "Turns: ", nTurnList[ i], file = wfile)
+            printSolution( pathXList[ i], pathYList[ i], wfile)
+        wfile.close()
 
-#    for k in sorted(nTurnList, key=dotsSs.__getitem__):
-#        print(k, dots_SizeOrders[k], dotsSs[ k])
 
     max_turns = 0
     max_len = 0
@@ -327,10 +338,31 @@ def analyze():
         if nTurnList[ i] + lenPathList[ i] == max_turnLen - 2:
             print( i, dots_SizeDict[ dots_SizeStringList[ i]])
 
+    for k in sorted(dots_SizeDict, key = dots_SizeDict.__getitem__, reverse = True):
+        print(k, dots_SizeDict[k])
+
+        # auf pattern in SizeString testen
+    for i in range( len( pathXList)):
+        if( dots_SizeStringList[i].find( "231231") > -1):
+            print( i, dots_SizeStringList[ i], dots1_SizeStringList[ i], dots2_SizeStringList[ i], dots1_ColorStringList[ i], dots2_ColorStringList[ i])
 
 
-    print( max_turns)
-    print( max_len)
+    # for i in range( len( pathXList)):
+    #     d1 = 0
+    #     d2 = 0
+    #     d1 += 1 if( dots1_ColorStringList[ i].find("1") > -1) else 0
+    #     d1 += 1 if( dots1_ColorStringList[ i].find("2") > -1) else 0
+    #     d1 += 1 if( dots1_ColorStringList[ i].find("3") > -1) else 0
+    #     d2 += 1 if( dots2_ColorStringList[ i].find("1") > -1) else 0
+    #     d2 += 1 if( dots2_ColorStringList[ i].find("2") > -1) else 0
+    #     d2 += 1 if( dots2_ColorStringList[ i].find("3") > -1) else 0
+    #     if( d1 == 1 or d2 == 1):
+    #        print( i, dots_SizeStringList[ i], dots1_SizeStringList[ i], dots2_SizeStringList[ i], dots1_ColorStringList[ i], dots2_ColorStringList[ i])
+
+    for i in range( len( pathXList)):
+        if( dots1_SizeStringList[ i] == "231" or dots2_SizeStringList[ i] == "231"):
+           print( i, dots_SizeStringList[ i], dots1_SizeStringList[ i], dots2_SizeStringList[ i], dots1_ColorStringList[ i], dots2_ColorStringList[ i])
+
     return
 
 if doSolve:
